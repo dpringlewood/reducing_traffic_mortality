@@ -162,3 +162,24 @@ melt_car = pd.melt(car_accidents,
                    var_name='measurement')
 
 print(melt_car.head())
+sns.violinplot(x='percent', y='measurement', data=melt_car, hue='cluster')
+plt.show()
+
+"""
+The above plot should help give some insight as to which actions need to be
+taken to get results. What would be good is to know which states to target first.
+Lets see how many deaths per cluster there are and make an informed decision from
+that.
+"""
+
+car_accidents_miles = car_accidents.merge(miles_driven, on='state')
+car_accidents_miles['num_fatal_accidents'] = (car_accidents_miles.drvr_fatl_col_bmiles*
+                                              car_accidents_miles.million_miles_annually)/1000
+
+sns.barplot(y='num_fatal_accidents', x='cluster',
+            data= car_accidents_miles, estimator=sum, ci=None)
+plt.show()
+
+# show this in a table
+count_mean_sum = car_accidents_miles.groupby('cluster')['num_fatal_accidents'].agg(['count', 'mean', 'sum'])
+print(count_mean_sum)
